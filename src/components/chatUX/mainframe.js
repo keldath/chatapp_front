@@ -1,5 +1,5 @@
 import { Component, Fragment } from 'react';
-
+import SocketContext  from '../../context/socketContext' 
 
 /*
  self notes:
@@ -36,13 +36,18 @@ class MainFrame extends Component {
             return
         } 
         this.cmpMounted = true;  
-        this.props.socket.on('userMsgReceived', (data) => {
+
+       // const socket = React.useContext(UserContext);
+
+        this.context.socket.on('userMsgReceived', (data) => {
             console.log('sagi '+ data)
             this.updateChatState(data)
         })
     }
     componentWillUnmount =() => {
         this.cmpMounted = false;
+        this.context.socket.close()//close socket when app is unmounted
+        this.context.socket.emit('disconnect');
     }
 
     msgHandler = (e) => {
@@ -78,7 +83,7 @@ class MainFrame extends Component {
     publicmsghandler = (e) => {
         if(!this.cmpMounted)
             return
-        this.props.socket.emit('userMsgReceived', { msg: this.state.inputmsg });
+        this.context.socket.emit('userMsgReceived', { msg: this.state.inputmsg });
         this.setState({...this.state,inputmsg: ''})
     }
 
@@ -97,8 +102,8 @@ class MainFrame extends Component {
 
 
     render () {
-
         return (
+            
             <Fragment>
                 <div>
                     <div className='chatpublicbox'>
@@ -114,5 +119,7 @@ class MainFrame extends Component {
         )
     }
 }
+
+MainFrame.contextType = SocketContext;
 export default MainFrame;
 

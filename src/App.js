@@ -1,40 +1,31 @@
 
-import ChatApp from './chatApp'
+import React from 'react';
+import {BrowserRouter, Switch, Route} from "react-router-dom";
 
+import MainFrame from './components/chatUX/mainframe'
+import Loginpage from './components/auth/loginpage'  
+import { SocketProvider}  from './context/socketContext' 
+   
 
 function App() {
-  return (
-   <ChatApp>
 
-   </ChatApp>
+  
+  return (
+   <React.Fragment>
+   <SocketProvider>
+      <p>Welcome to this Chat</p>
+      <BrowserRouter >
+          <Switch>
+              <Route path='/login' exact component={Loginpage} ></Route>
+              <Route path='/main' exact component={MainFrame} ></Route>
+              <Route path='/' component={Loginpage} ></Route>
+          </Switch>
+      </BrowserRouter>
+   </SocketProvider>
+   </React.Fragment>  
   );
 }
 
 export default App;
 
 
-
-
-/*
-import './App.css';
-import logo from './logo.svg';
-org 
-
- <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-
-*/
