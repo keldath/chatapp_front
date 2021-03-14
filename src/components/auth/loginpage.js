@@ -38,13 +38,13 @@ class Loginpage extends Component {
         })
 
         
-        this.context.socket.on('newusercreated', () => {
-            this.redirectHandler();
+        this.context.socket.on('newusercreated', (user) => {
+            this.redirectHandler(user);
         })
 
-        this.context.socket.on('loginsucces', () => {
+        this.context.socket.on('loginsucces', (user) => {
             console.log('log succesfull')
-            this.redirectHandler()
+            this.redirectHandler(user)
         })
         
     }
@@ -56,7 +56,9 @@ class Loginpage extends Component {
         })
     }
 
-    redirectHandler = () => {
+    redirectHandler = (user) => {
+        console.log(user)
+        console.log(this.context.changest(user))
         this.setState({
             ...this.state,
             redirect:  <Redirect to={{ pathname: "/main"}}/>

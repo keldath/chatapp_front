@@ -39,9 +39,8 @@ class MainFrame extends Component {
 
        // const socket = React.useContext(UserContext);
 
-        this.context.socket.on('userMsgReceived', (data) => {
-            console.log('sagi '+ data)
-            this.updateChatState(data)
+        this.context.socket.on('userMsgReceived', (msg,sender,timestamp) => {
+            this.updateChatState(msg,sender,timestamp)
         })
     }
     componentWillUnmount =() => {
@@ -58,22 +57,22 @@ class MainFrame extends Component {
         })
     }
 
-    updateChatState = (msg) => {
+    updateChatState = (msg,sender,timestamp) => {
         if(!this.cmpMounted)
             return
-        const timestamp = Date.now();
-        const time = new Intl.DateTimeFormat('en-US', {year: 'numeric', 
-                                    day: '2-digit', month: '2-digit',
-                                    hour: '2-digit', minute: '2-digit', 
-                                    second: '2-digit', hour12: false}).format(timestamp)
+        // const timestamp = Date.now();
+        // const time = new Intl.DateTimeFormat('en-US', {year: 'numeric', 
+        //                             day: '2-digit', month: '2-digit',
+        //                             hour: '2-digit', minute: '2-digit', 
+        //                             second: '2-digit', hour12: false}).format(timestamp)
          this.setState({
                 ...this.state,
                 publicchatlog: 
                 [...this.state.publicchatlog , 
                     {
-                        time: time,
+                        time: timestamp,
                         txt: msg,
-                        user: 'me'
+                        user: sender
                     }
                 ]  
             }
@@ -83,7 +82,7 @@ class MainFrame extends Component {
     publicmsghandler = (e) => {
         if(!this.cmpMounted)
             return
-        this.context.socket.emit('userMsgReceived', { msg: this.state.inputmsg });
+        this.context.socket.emit('userMsgReceived', { msg: this.state.inputmsg ,sender: this.context.data.signUser});
         this.setState({...this.state,inputmsg: ''})
     }
 
@@ -92,6 +91,7 @@ class MainFrame extends Component {
 
             if (item.time !== '')
                 return (<div key={idx}>
+                        <span>{item.time} </span>
                         <span>{item.user} </span>
                         <span>{item.txt}</span>
                         </div>);
@@ -106,6 +106,7 @@ class MainFrame extends Component {
             
             <Fragment>
                 <div>
+                    <div>User Logged: {this.context.data.signUser}</div>
                     <div className='chatpublicbox'>
                         {this.chatBoxUpdate()}
                     </div>

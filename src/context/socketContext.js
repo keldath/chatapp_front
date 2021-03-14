@@ -3,11 +3,24 @@ import socketClient from "socket.io-client";
    
 
 const SERVER = "http://127.0.0.1:8080";
+
 const SocketContext = React.createContext();
 
 export const SocketConsumer = SocketContext.Consumer;
 
 export class SocketProvider extends Component {
+    
+ 
+    state = {
+        signUser: 'aa'
+    }
+    
+    changestate = (value) => {
+        this.setState({
+            ...this.state,
+            signUser: value
+        })
+    }
 
     socketHandler = () => {
     let socket =  socketClient(SERVER
@@ -33,7 +46,7 @@ export class SocketProvider extends Component {
     render() {
         console.log('socket rendered')
         return (
-            <SocketContext.Provider value={{socket: this.socketHandler(),text: 'txt'}}> 
+            <SocketContext.Provider value={{socket: this.socketHandler(),data: {...this.state}, changest: this.changestate}}> 
                     {this.props.children}
             </SocketContext.Provider>
                 
