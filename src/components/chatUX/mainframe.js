@@ -1,10 +1,14 @@
 import { Component, Fragment } from 'react';
+import { Redirect } from "react-router-dom";
 
 import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
+import Container from '@material-ui/core/Container';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 
 import SocketContext  from '../../context/socketContext' 
-import { Redirect } from "react-router-dom";
+
 /*
  self notes:
  destructuring doesnt work on Edge (...)
@@ -44,9 +48,13 @@ class MainFrame extends Component {
         } 
         this.cmpMounted = true;   
 
-        this.context.socket.emit('updateuserlist',
-            (this.context.data.signUser)
-        )
+        if(this.context.data.signUser === '') {
+            this.setState({...this.state, redirect: <Redirect to={{ pathname: "/login"}}/> })
+        }
+        else {
+            this.context.socket.emit('updateuserlist',
+            (this.context.data.signUser))
+        }
         
         this.context.socket.on('updateuserlistall', (data) => {
             this.updateUserlistState(data)
@@ -79,11 +87,11 @@ class MainFrame extends Component {
     componentWillUnmount =() => {
         //avoid re render issues, clumsy way...
         this.cmpMounted = false;
-        this.context.socket.close()//close socket when app is unmounted
+    //    this.context.socket.close()//close socket when app is unmounted
         //this.context.socket.emit('disconnect');
         //when closed go back to login
         sessionStorage.removeItem('user')
-        this.setState({...this.state, redirect: <Redirect to={{ pathname: "/login"}}/> })
+    //    this.setState({...this.state, redirect: <Redirect to={{ pathname: "/login"}}/> })
     }
 
 /* handle input start*/ 
@@ -164,23 +172,37 @@ class MainFrame extends Component {
         return (
             
             <Fragment>
-                {this.state.redirect}
-                <div>
-                    <div>User Logged: {this.context.data.signUser}</div>
-                    <div className='chatpublicbox'>
+                <div>User Logged: {this.context.data.signUser}</div>
+                <Container variant='outlined' square='false' style={{ minHeight: "84vh",maxHeight: "84vh",  marginTop: '2vh' }}  className='wrapper' >
+                 {this.state.redirect}
+                 <Grid container>
+                    <Grid item justify="center" style={{ minWidth: "82vw" , minHeight: "70vh", maxHeight: "70vh", border: '5px solid white' ,overflowY: 'auto'}}>
                         {this.chatBoxUpdateDOM()}
-                    </div>
-                    <div className='userlist' >{this.userListUpdateDOM()}</div>
-                    <label htmlFor='msgbox'>write here: 
-                        <input type='text' name='msgbox' value={this.state.inputmsg} 
-                                    onChange={this.msgHandler}/> 
-                    </label>
-                    <Button  variant="contained"
+                    </Grid>
+                    <Grid item justify="center" className='userlist' style={{ minWidth: "10vw", border: '5px solid white', borderLeft: '0px' ,overflowY: 'auto'}}>
+                        {this.userListUpdateDOM()}
+                    </Grid>
+                </Grid>
+                <Grid container>
+                    <Grid container  justify="center" style={{ maxWidth: "92vw"  ,border: '5px solid white', alignContent: 'center'}}>
+                    <TextField id="soutlined"
+                                   label="Label"
+                                   style={{ margin: 8 }}
+                                   placeholder="Placeholder"
+                                   margin="normal"
+                                   InputLabelProps={{
+                                     shrink: true,
+                                   }}
+                                   name='msgbox' 
+                                   onChange={this.msgHandler}/> 
+                    <Button variant="contained"
                             color="default"
                             style={{margin: 'spacing(1)'}}
                             startIcon={<CloudUploadIcon />}
                             className='submit' onClick={this.publicmsghandler}>SEND</Button>
-                </div>
+                    </Grid>
+                </Grid>
+                </Container>
             </Fragment>
         )
     }

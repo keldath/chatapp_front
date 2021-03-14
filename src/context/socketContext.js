@@ -12,7 +12,7 @@ export class SocketProvider extends Component {
     
  
     state = {
-        signUser: 'aa'
+        signUser: ''
     }
     
     changestate = (value) => {

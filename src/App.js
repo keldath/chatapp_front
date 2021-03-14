@@ -7,6 +7,7 @@ import Loginpage from './components/auth/loginpage'
 import SocketContext, { SocketProvider}  from './context/socketContext' 
 
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
 
@@ -31,7 +32,12 @@ export default class App extends Component {
                                                               background: 'linear-gradient(to right, #4ca1af, #c4e0e5)', 
                                                               height: '100vh' }} >
       
-         <p>Welcome to this Chat</p>
+         <Typography  style={{ background: 'linear-gradient(to right, rgb(73 153 165), rgb(109 150 154))', 
+                                  paddingTop: '10px',
+                                  paddingBottom: '5px',
+                                  textAlign: 'center' }}>
+                                    Welcome to AnyChat
+                                    </Typography>
          <BrowserRouter >
              <Switch>
                  <Route path='/login' exact component={Loginpage} ></Route>
