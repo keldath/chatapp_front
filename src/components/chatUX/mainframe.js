@@ -42,7 +42,27 @@ class MainFrame extends Component {
         this.context.socket.on('userMsgReceived', (msg,sender,timestamp) => {
             this.updateChatState(msg,sender,timestamp)
         })
+        this.context.socket.emit('displaylastmsg')
+        this.context.socket.on('sendlastmsg', (res) => {
+         //show last 10 messages
+            console.log(res)
+            for(let i=0;i< res.length;i++) {
+                this.setState({
+                    ...this.state,
+                    publicchatlog: 
+                    [...this.state.publicchatlog , 
+                        {
+                            time: res[i].createon,
+                            txt: res[i].msg,
+                            user: res[i].userNick
+                        }
+                    ]  
+                }
+                )
+            }
+        })
     }
+
     componentWillUnmount =() => {
         this.cmpMounted = false;
         this.context.socket.close()//close socket when app is unmounted

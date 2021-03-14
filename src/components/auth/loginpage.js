@@ -36,7 +36,6 @@ class Loginpage extends Component {
                 })
             },5000)
         })
-
         
         this.context.socket.on('newusercreated', (user) => {
             this.redirectHandler(user);
@@ -58,7 +57,11 @@ class Loginpage extends Component {
 
     redirectHandler = (user) => {
         console.log(user)
+        sessionStorage.removeItem('user')
+        sessionStorage.setItem('user', user);
         console.log(this.context.changest(user))
+        
+        //this.context.socket.emit('displaylastmsg')
         this.setState({
             ...this.state,
             redirect:  <Redirect to={{ pathname: "/main"}}/>
@@ -80,7 +83,7 @@ class Loginpage extends Component {
     }
 
     loginHandler =() => {
-        // sessionStorage.removeItem('auth')
+        
         this.context.socket.emit('logintochat', {
             name: this.state.name,
             pwd: this.state.pwd
@@ -110,7 +113,7 @@ class Loginpage extends Component {
                 <button className='signin' onClick={this.loginHandler}>SIGNUP</button>
                 <div>test data</div>
                 <div>{this.state.authenticated ? 'Logged' : 'Not Logged'}</div>
-                <div>{sessionStorage.getItem('auth')}</div>
+                <div>{sessionStorage.getItem('user')}</div>
             </div>
         )
     }
