@@ -1,5 +1,8 @@
 import { Component, Fragment } from 'react';
 
+import Button from '@material-ui/core/Button';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+
 import SocketContext  from '../../context/socketContext' 
 import { Redirect } from "react-router-dom";
 /*
@@ -12,6 +15,7 @@ import { Redirect } from "react-router-dom";
 /*without this indicator - the component gets an err
  src: https://stackoverflow.com/questions/53949393/cant-perform-a-react-state-update-on-an-unmounted-component
 */
+
 
 class MainFrame extends Component {
    
@@ -171,7 +175,11 @@ class MainFrame extends Component {
                         <input type='text' name='msgbox' value={this.state.inputmsg} 
                                     onChange={this.msgHandler}/> 
                     </label>
-                    <button className='submit' onClick={this.publicmsghandler}>SEND</button>
+                    <Button  variant="contained"
+                            color="default"
+                            style={{margin: 'spacing(1)'}}
+                            startIcon={<CloudUploadIcon />}
+                            className='submit' onClick={this.publicmsghandler}>SEND</Button>
                 </div>
             </Fragment>
         )

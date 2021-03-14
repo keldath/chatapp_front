@@ -5,7 +5,10 @@ import {BrowserRouter, Switch, Route} from "react-router-dom";
 import MainFrame from './components/chatUX/mainframe'
 import Loginpage from './components/auth/loginpage'  
 import SocketContext, { SocketProvider}  from './context/socketContext' 
- 
+
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Typography from '@material-ui/core/Typography';
+
 
 export default class App extends Component {
  
@@ -19,9 +22,15 @@ export default class App extends Component {
   // }
 
   render() {
+
     return (
       <React.Fragment>
       <SocketProvider>
+        <CssBaseline />
+        <Typography component="div" justify="center" style={{ 
+                                                              background: 'linear-gradient(to right, #4ca1af, #c4e0e5)', 
+                                                              height: '100vh' }} >
+      
          <p>Welcome to this Chat</p>
          <BrowserRouter >
              <Switch>
@@ -31,6 +40,7 @@ export default class App extends Component {
                  <Route path='/' component={Loginpage} ></Route>
              </Switch>
          </BrowserRouter>
+         </Typography>
       </SocketProvider>
       </React.Fragment>  
      );
