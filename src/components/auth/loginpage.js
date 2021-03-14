@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { Redirect } from "react-router-dom";
+
 import SocketContext  from '../../context/socketContext' 
 
 
@@ -8,7 +10,9 @@ class Loginpage extends Component {
         cmpMounted : true,
         name: '',
         pwd: '',
-        authenticated: false
+        authenticated: false,
+        wrongcred: false,
+        redirect: null
     }
     
     componentDidMount = () => {
@@ -20,10 +24,29 @@ class Loginpage extends Component {
             cmpMounted: true
         })
 
-        this.context.socket.on('login', (data) => {
-            console.log('authenticated login '+ data)
-            
+        this.context.socket.on('logintochaterr', (data) => {
+            this.setState({
+                ...this.state,
+                wrongcred: true
+            });
+            //REMOVE THE MESSAGE AFTER 1 SECOND
+            setTimeout(()=> {
+                this.setState({...this.state,
+                    wrongcred: false
+                })
+            },5000)
         })
+
+        
+        this.context.socket.on('newusercreated', () => {
+            this.redirectHandler();
+        })
+
+        this.context.socket.on('loginsucces', () => {
+            console.log('log succesfull')
+            this.redirectHandler()
+        })
+        
     }
 
     componentWillUnmount =() => {
@@ -31,12 +54,16 @@ class Loginpage extends Component {
             ...this.state,
             cmpMounted: false
         })
-        sessionStorage.removeItem('auth')
+    }
+
+    redirectHandler = () => {
+        this.setState({
+            ...this.state,
+            redirect:  <Redirect to={{ pathname: "/main"}}/>
+        });
     }
 
     NameHandle = (e) => {
-        // this.props.socket
-        // e.target.value
         this.setState({
             ...this.state,
             name: e.target.value
@@ -44,45 +71,28 @@ class Loginpage extends Component {
     }
     
     pwdhandle = (e) => {
-        // this.props.socket
-        // e.target.value
         this.setState({
             ...this.state,
             pwd: e.target.value
         })
     }
 
-    signIn = () => {
-        //if auth checks out - set true
-        console.log(this.state.authenticated)
-
-        this.context.socket.emit('login', {
+    loginHandler =() => {
+        // sessionStorage.removeItem('auth')
+        this.context.socket.emit('logintochat', {
             name: this.state.name,
             pwd: this.state.pwd
             }
         );
-
-        sessionStorage.setItem('auth', this.state.name);
-        this.setState({
-            ...this.state,
-            authenticated: !this.state.authenticated
-        })
-    }
-
-    signOut =() => {
-        sessionStorage.removeItem('auth')
-        this.setState({
-            name: '',
-            pwd: '',
-            authenticated: false
-        })
     }
     
     render() {
         return (
             <div className='logBox'>
+                {this.state.redirect}
                 Welcome commrade
                 <br/>
+                {this.state.wrongcred ? <div>User Does not exists or wrong password</div> : null}
                 <label htmlFor='nickname'>NickName
                         <br/>
                         <input type='text' name='nickname' value={this.state.name}
@@ -95,8 +105,7 @@ class Loginpage extends Component {
                                     onChange={this.pwdhandle}/> 
                 </label>
                 <br/>
-                <button className='signin' onClick={this.signIn}>SIGNIN</button>
-                <button className='signup' onClick={this.signOut}>SIGNUP</button>
+                <button className='signin' onClick={this.loginHandler}>SIGNUP</button>
                 <div>test data</div>
                 <div>{this.state.authenticated ? 'Logged' : 'Not Logged'}</div>
                 <div>{sessionStorage.getItem('auth')}</div>
