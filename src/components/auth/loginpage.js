@@ -25,6 +25,7 @@ class Loginpage extends Component {
         })
 
         this.context.socket.on('logintochaterr', (data) => {
+
             this.setState({
                 ...this.state,
                 wrongcred: true
@@ -57,9 +58,8 @@ class Loginpage extends Component {
 
     redirectHandler = (user) => {
         console.log(user)
-        sessionStorage.removeItem('user')
         sessionStorage.setItem('user', user);
-        console.log(this.context.changest(user))
+        this.context.changest(user)
         
         //this.context.socket.emit('displaylastmsg')
         this.setState({
@@ -97,7 +97,7 @@ class Loginpage extends Component {
                 {this.state.redirect}
                 Welcome commrade
                 <br/>
-                {this.state.wrongcred ? <div>User Does not exists or wrong password</div> : null}
+                {this.state.wrongcred ? <div>User Does not exists / wrong password / already connected</div> : null}
                 <label htmlFor='nickname'>NickName
                         <br/>
                         <input type='text' name='nickname' value={this.state.name}

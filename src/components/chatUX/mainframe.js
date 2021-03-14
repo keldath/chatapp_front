@@ -1,6 +1,7 @@
 import { Component, Fragment } from 'react';
-import SocketContext  from '../../context/socketContext' 
 
+import SocketContext  from '../../context/socketContext' 
+import { Redirect } from "react-router-dom";
 /*
  self notes:
  destructuring doesnt work on Edge (...)
@@ -22,22 +23,30 @@ class MainFrame extends Component {
 		this.cmpMounted = true;
 		this.state = {
         inputmsg: '',
-            publicchatlog: [
-                {   
-                    time: '',
-                    txt: '' ,
-                    user: ''
-                }
-            ]
+        publicchatlog: [
+            {   
+                time: '',
+                txt: '' ,
+                user: ''
+            }
+        ],
+        userList: [],
+        redirect: ''
         }
     }
     componentDidMount = () => {
         if (!this.cmpMounted) {
             return
         } 
-        this.cmpMounted = true;  
+        this.cmpMounted = true;   
 
-       // const socket = React.useContext(UserContext);
+        this.context.socket.emit('updateuserlist',
+            (this.context.data.signUser)
+        )
+        
+        this.context.socket.on('updateuserlistall', (data) => {
+            this.updateUserlistState(data)
+        })
 
         this.context.socket.on('userMsgReceived', (msg,sender,timestamp) => {
             this.updateChatState(msg,sender,timestamp)
@@ -64,11 +73,16 @@ class MainFrame extends Component {
     }
 
     componentWillUnmount =() => {
+        //avoid re render issues, clumsy way...
         this.cmpMounted = false;
         this.context.socket.close()//close socket when app is unmounted
-        this.context.socket.emit('disconnect');
+        //this.context.socket.emit('disconnect');
+        //when closed go back to login
+        sessionStorage.removeItem('user')
+        this.setState({...this.state, redirect: <Redirect to={{ pathname: "/login"}}/> })
     }
 
+/* handle input start*/ 
     msgHandler = (e) => {
         if(!this.cmpMounted)
             return
@@ -76,15 +90,11 @@ class MainFrame extends Component {
             inputmsg: e.target.value
         })
     }
-
+/* public state updates */
     updateChatState = (msg,sender,timestamp) => {
         if(!this.cmpMounted)
             return
-        // const timestamp = Date.now();
-        // const time = new Intl.DateTimeFormat('en-US', {year: 'numeric', 
-        //                             day: '2-digit', month: '2-digit',
-        //                             hour: '2-digit', minute: '2-digit', 
-        //                             second: '2-digit', hour12: false}).format(timestamp)
+        //update public chat with the new message
          this.setState({
                 ...this.state,
                 publicchatlog: 
@@ -99,6 +109,14 @@ class MainFrame extends Component {
         )
     }
 
+    updateUserlistState = (data) => {
+        if(!this.cmpMounted)
+            return
+         //update public chat with the new message
+         this.setState({...this.state, userList : [...data]})
+    }
+/* handle input end */ 
+
     publicmsghandler = (e) => {
         if(!this.cmpMounted)
             return
@@ -106,7 +124,9 @@ class MainFrame extends Component {
         this.setState({...this.state,inputmsg: ''})
     }
 
-    chatBoxUpdate () {
+/*public info update*/ 
+
+    chatBoxUpdateDOM () {
         return this.state.publicchatlog.map((item,idx)=> {
 
             if (item.time !== '')
@@ -120,16 +140,33 @@ class MainFrame extends Component {
         })
     }
 
+    userListUpdateDOM () {
+        let list = this.state.userList;
+
+        if (list === undefined)
+            return null;
+
+        if (list.length < 1)
+            return null;
+        console.log(this.state.userList)
+        return this.state.userList.map((item,idx)=> {
+                return (<div key={idx}>
+                        <span>{item}<br/></span>
+                        </div>);
+        })
+    }
 
     render () {
         return (
             
             <Fragment>
+                {this.state.redirect}
                 <div>
                     <div>User Logged: {this.context.data.signUser}</div>
                     <div className='chatpublicbox'>
-                        {this.chatBoxUpdate()}
+                        {this.chatBoxUpdateDOM()}
                     </div>
+                    <div className='userlist' >{this.userListUpdateDOM()}</div>
                     <label htmlFor='msgbox'>write here: 
                         <input type='text' name='msgbox' value={this.state.inputmsg} 
                                     onChange={this.msgHandler}/> 
