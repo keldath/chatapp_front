@@ -140,7 +140,11 @@ class MainFrame extends Component {
          
     }
 /* handle input end */ 
-
+    handleKeyPress = (e) => {
+        if (e.key === "Enter") {
+            this.publicmsghandler(e);
+        }
+    }
     publicmsghandler = (e) => {
         if(!this.cmpMounted)
             return
@@ -158,16 +162,30 @@ class MainFrame extends Component {
 
     chatBoxUpdateDOM () {
         
-        return this.state.publicchatlog.map((item,idx)=> {
+        let reveselist = this.state.publicchatlog/*.reverse();*///i forgotits an object. need to find another way
+        return reveselist.map((item,idx)=> {
 
             let avatar = LetterAvatars(item.user.substring(0,2),item.avatar) //item.avatar
+            let theirMsg = { padding: '10px' , color: '#0042d6' }
+            let mymsg = { textAlignLast: 'right'}
             if (item.time !== '')   {
       //        let uniquetime = 'timebtn' + item.time
-                return (<div key={idx} style={{ padding: '10px' , color: '#0042d6'}}>
+                console.log(item.user , this.context.data.signUser)
+                if (item.user === this.context.data.signUser) {
+                    return (<div key={idx} style={{...mymsg, ...theirMsg}}>
                         {/*wanted to make a button to reveal time stamp - for now removed timestamp  */}
                         {/* <Button id={uniquetime} onClick={this.msgTimeHandler}><AccessTimeIcon/><span id={uniquetime} >{item.time} </span></Button>  */}
-                        <span >{avatar} {item.txt}</span>
+                        <span >{item.txt} {avatar}</span>
                         </div>);
+                }
+                else {
+                    return (<div key={idx} style={theirMsg}>
+                        {/*wanted to make a button to reveal time stamp - for now removed timestamp  */}
+                        {/* <Button id={uniquetime} onClick={this.msgTimeHandler}><AccessTimeIcon/><span id={uniquetime} >{item.time} </span></Button>  */}
+                        <span >{avatar} {item.txt} </span>
+                        </div>);
+                }
+                
             }
             else {
                 return null;
@@ -240,7 +258,9 @@ class MainFrame extends Component {
                                              shrink: true,
                                            }}
                                            name='msgbox' 
-                                           onChange={this.msgHandler}/> 
+                                           value={this.state.inputmsg}
+                                           onChange={this.msgHandler}
+                                           onKeyPress={this.handleKeyPress}/> 
                         </Grid>
                         <Grid  className='userlist'  style={{ /*minWidth: "17vw",*/ width:"19%",minWidth: "10%"}}>              
                             <Button variant="contained"
@@ -248,7 +268,8 @@ class MainFrame extends Component {
                                     style={{  width:"100%", height: '5.4vh', justifyContent: 'end' ,minWidth: "50%"}}
                                     startIcon={<CloudUploadIcon  />}
                                     className='submit' 
-                                    onClick={this.publicmsghandler}>SEND</Button>
+                                    onClick={this.publicmsghandler}
+                                     >SEND</Button>
                         </Grid>        
                     </Grid>
                 </Grid>
