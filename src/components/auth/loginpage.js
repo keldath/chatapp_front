@@ -27,7 +27,7 @@ class Loginpage extends Component {
     
     componentDidMount = () => {
         if (!this.state.cmpMounted) {
-            return
+            return;
         } 
         this.setState({
             ...this.state,
@@ -45,7 +45,7 @@ class Loginpage extends Component {
                 this.setState({...this.state,
                     wrongcred: false
                 })
-            },5000)
+            },5000);
         })
         
         this.context.socket.on('newusercreated', (user) => {
@@ -54,7 +54,7 @@ class Loginpage extends Component {
 
         this.context.socket.on('loginsucces', (user) => {
             console.log('log succesfull')
-            this.redirectHandler(user)
+            this.redirectHandler(user);
         })
     }
 
@@ -63,14 +63,13 @@ class Loginpage extends Component {
     // }
 
     redirectHandler = (user) => {
-        console.log(user)
         sessionStorage.setItem('user', user);
-        this.context.changest(user)
+        this.context.changest(user);
         
         //this.context.socket.emit('displaylastmsg')
         this.setState({
             ...this.state,
-            redirect:  <Redirect to={{ pathname: "/main"}}/>
+            redirect:  <Redirect to={{ pathname: "/AnyChat/main"}}/>
         });
     }
 
@@ -100,12 +99,12 @@ class Loginpage extends Component {
     
     render() {
         return (
-            <Container variant='outlined' square='false' style={{ maxWidth: "50vh", margin: 'auto', marginTop: '20vh' }}  className='wrapper' >
-                <Grid style={{ backgroundColor: 'white', opacity: 0.9 ,borderRadius:'20px' ,boxShadow:'3px 5px #888888'}} > 
-                <Grid container justify="center" > 
-                    {this.state.redirect}
-                    <Grid item style={{ padding: "5px" }}>
-                    <Typography variant="h6" style={{ textDecoration: 'underline' ,  paddingTop: "5px"}}>  Enter Credencials</Typography>
+        <Container variant='outlined' square='false' style={{ maxWidth: "50vh", margin: 'auto', marginTop: '20vh' }}  className='wrapper' >
+            <Grid style={{ backgroundColor: 'white', opacity: 0.9 ,borderRadius:'20px' ,boxShadow:'3px 5px #888888'}} > 
+                    <Grid container justify="center" > 
+                        {this.state.redirect}
+                        <Grid item style={{ padding: "5px" }}>
+                        <Typography variant="h6" style={{ textDecoration: 'underline' ,  paddingTop: "5px"}}>  Enter Credencials</Typography>
                     </Grid>
                 </Grid>
                 <Grid container spacing={5} justify="center" >
@@ -135,15 +134,12 @@ class Loginpage extends Component {
                     <br/>
                     
                 </Grid>
-                <Grid item  xs={8}>
-                        <Button fullWidth variant="contained" color="primary" className='signin' onClick={this.loginHandler}>Start Chatting...</Button>
+                    <Grid item  xs={8}>
+                            <Button fullWidth variant="contained" color="primary" className='signin' onClick={this.loginHandler}>Start Chatting...</Button>
+                    </Grid>
                 </Grid>
-                </Grid>
-                {/* <div>test data</div>
-                <div>{this.state.authenticated ? 'Logged' : 'Not Logged'}</div>
-                <div>{sessionStorage.getItem('user')}</div> */}
-                </Grid> 
-            </Container>
+            </Grid> 
+        </Container>
         )
     }
 }

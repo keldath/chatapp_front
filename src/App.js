@@ -43,9 +43,10 @@ export default class App extends Component {
                                     </Typography>
          <BrowserRouter >
              <Switch>
-                 <Route path='/login' exact component={Loginpage} ></Route>
+                 <Route path='/AnyChat/login' exact component={Loginpage} ></Route>
                  {/* {this.context.signUser !== '' || this.context.signUser !== undefined ? <Route path='/main' exact component={MainFrame} ></Route> : null}  */}
-                 <Route path='/main' exact component={MainFrame} ></Route> 
+                 <Route path='/AnyChat/main' exact component={MainFrame} ></Route> 
+                 <Route path='/AnyChat' component={Loginpage} ></Route>
                  <Route path='/' component={Loginpage} ></Route>
              </Switch>
          </BrowserRouter>

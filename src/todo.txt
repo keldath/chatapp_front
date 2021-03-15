@@ -1,6 +1,6 @@
 
 
--user disconnection when exit chat page
+-user disconnection when exit chat page - done
 -authentication with token
 -register screen - with questions?
 -timeout check?
@@ -8,8 +8,8 @@
 -block navigation to the route /main
 -better event names for the sockets
 -cleaner code
--user avatars
--rank and clean up for last 10 messages table
+-user avatars - done
+-rank and clean up for last 10 messages table - added order by - but need to sort the list on display...
 -middleware checks
 -error handling
 -type of parameters saftey checks

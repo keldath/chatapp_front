@@ -5,14 +5,13 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
-//import Box from '@material-ui/core/Box';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-//import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import LetterAvatars from './avatars'
+
 import  MyColors, { MyColorsamt } from './colors'
 import SocketContext  from '../../context/socketContext' 
-
 import './mainframe.module.css'
+
 /*
  self notes:
  destructuring doesnt work on Edge (...)
@@ -49,27 +48,26 @@ class MainFrame extends Component {
     }
     componentDidMount = () => {
         if (!this.cmpMounted) {
-            return
+            return;
         } 
         this.cmpMounted = true;   
         if(this.context.data.signUser === '') {
-            this.setState({...this.state, redirect: <Redirect to={{ pathname: "/login"}}/> })
+            this.setState({...this.state, redirect: <Redirect to={{ pathname: "/AnyChat/login"}}/> });
         }
         else {
-            let randomColor = (MyColors([Math.floor((Math.random() * MyColorsamt()) + 1)]))
-            console.log(MyColors(Math.floor((Math.random() * MyColorsamt()) + 1)))           
+            let randomColor = (MyColors([Math.floor((Math.random() * MyColorsamt()) + 1)]));
             //this.setState({...this.state, userDist: {...this.state.userDist, [this.context.data.signUser]:'avi'}})//add user and avatar to the list
-            this.context.socket.emit('updateuserlist', [this.context.data.signUser , randomColor ])//add user and avatar to the list to all
+            this.context.socket.emit('updateuserlist', [this.context.data.signUser , randomColor ]);//add user and avatar to the list to all
         }
         
         this.context.socket.on('updateuserlistall', (data) => {
-            this.updateUserlistState(data)
+            this.updateUserlistState(data);
         })
 
         this.context.socket.on('userMsgReceived', (msg,sender,timestamp,avatar) => {
-            this.updateChatState(msg,sender,timestamp,avatar)
+            this.updateChatState(msg,sender,timestamp,avatar);
         })
-        this.context.socket.emit('displaylastmsg')
+        this.context.socket.emit('displaylastmsg');
         this.context.socket.on('sendlastmsg', (res) => {
          //show last 10 messages
             for(let i=0;i< res.length;i++) {
@@ -88,16 +86,15 @@ class MainFrame extends Component {
                 )
             }
         })
-        console.log(this.state)
     }
 
     componentWillUnmount =() => {
     //avoid re render issues, clumsy way...
        // this.cmpMounted = false;
-        this.context.socket.emit('logout',this.context.data.signUser)
-        this.context.socket.close()//close socket when app is unmounted
+        this.context.socket.emit('logout',this.context.data.signUser);
+        this.context.socket.close();//close socket when app is unmounted
         //when closed go back to login
-        sessionStorage.removeItem('user')
+        sessionStorage.removeItem('user');
         window.location.replace( window.location.origin+"/login");
 
     //  this.setState({...this.state, redirect: <Redirect to={{ pathname: "/login"}}/> })
@@ -106,7 +103,7 @@ class MainFrame extends Component {
 /* handle input start*/ 
     msgHandler = (e) => {
         if(!this.cmpMounted)
-            return
+            return;
         this.setState({
             inputmsg: e.target.value
         })
@@ -114,7 +111,7 @@ class MainFrame extends Component {
 /* public state updates */
     updateChatState = (msg,sender,timestamp,avatar) => {
         if(!this.cmpMounted)
-            return
+            return;
         //update public chat with the new message
          this.setState({
                 ...this.state,
@@ -133,9 +130,8 @@ class MainFrame extends Component {
 
     updateUserlistState = (data) => {
         if(!this.cmpMounted)
-            return
+            return;
          //update public chat with the new message
-         //this.setState({...this.state, userList : [...data]})
          this.setState({...this.state, userDist : {...data}})
          
     }
@@ -147,9 +143,9 @@ class MainFrame extends Component {
     }
     publicmsghandler = (e) => {
         if(!this.cmpMounted)
-            return
+            return;
         this.context.socket.emit('userMsgReceived', { msg: this.state.inputmsg ,sender: this.context.data.signUser, avatar: this.state.userDist[this.context.data.signUser]});
-        this.setState({...this.state,inputmsg: ''})
+        this.setState({...this.state,inputmsg: ''});
     }
 
 /*public info update*/ 
@@ -210,29 +206,14 @@ class MainFrame extends Component {
                         <span >{avatar} {item}<br/></span>
                         </div>);
         })
-
-
-        // let list = this.state.userList;
-
-        // if (list === undefined)
-        //     return null;
-
-        // if (list.length < 1)
-        //     return null;
-        // return this.state.userList.map((item,idx)=> {
-        //         return (<div key={idx} style={{ padding: '6px' }}>
-        //                 <span >{item}<br/></span>
-        //                 </div>);
-        // })
     }
 
     render () {
-        const barstyle ={background: 'linear-gradient(to bottom, #4ca1af, #c4e0e5)', color: 'yellow', textAlign: 'center' ,fontSize:'2.5vh' ,justifyContent: "center"}
-        const barStyleplus = {fontSize:'1.5vh'} 
-        const grids1 = {background: 'linear-gradient(to left, #e0eafc, #cfdef3)'}
-        const grids2 =  {background: 'linear-gradient(to left, rgb(224, 234, 252), rgb(174 200 236))'}
-        const fonts = {fontWeight: 'bold'}
-
+        const barstyle ={background: 'linear-gradient(to bottom, #4ca1af, #c4e0e5)', color: 'yellow', textAlign: 'center' ,fontSize:'2.5vh' ,justifyContent: "center"};
+        const barStyleplus = {fontSize:'1.5vh'} ;
+        const grids1 = {background: 'linear-gradient(to left, #e0eafc, #cfdef3)'};
+        const grids2 =  {background: 'linear-gradient(to left, rgb(224, 234, 252), rgb(174 200 236))'};
+        const fonts = {fontWeight: 'bold'};
         
         return (
             <Fragment>
@@ -273,28 +254,6 @@ class MainFrame extends Component {
                         </Grid>        
                     </Grid>
                 </Grid>
-                {/* <Grid container >
-                    <Grid container style={{ maxWidth: "92vw"  ,border: '5px solid white', alignContent: 'center',backgroundColor: '#9fc8ca'}}>
-                        <Box  width="80%" className='userlist'>   
-                            <TextField id="soutlined"
-                                           style={{ margin: 8, width:"70vw" }}
-                                           margin="normal"
-                                           InputLabelProps={{
-                                             shrink: true,
-                                           }}
-                                           name='msgbox' 
-                                           onChange={this.msgHandler}/> 
-                        </Box>
-                        <Box  width="20%" className='userlist' >              
-                            <Button variant="contained"
-                                    color="default"
-                                    style={{  width:"-webkit-fill-available", height: '5.4vh', justifyContent: 'end'}}
-                                    startIcon={<CloudUploadIcon  />}
-                                    className='submit' 
-                                    onClick={this.publicmsghandler}>SEND</Button>
-                        </Box>        
-                    </Grid>
-                </Grid> */}
                 </Container>
             </Fragment>
         )
