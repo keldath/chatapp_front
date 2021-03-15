@@ -5,12 +5,14 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
-import Box from '@material-ui/core/Box';
+//import Box from '@material-ui/core/Box';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 //import AccessTimeIcon from '@material-ui/icons/AccessTime';
-
+import LetterAvatars from './avatars'
+import  MyColors, { MyColorsamt } from './colors'
 import SocketContext  from '../../context/socketContext' 
 
+import './mainframe.module.css'
 /*
  self notes:
  destructuring doesnt work on Edge (...)
@@ -21,7 +23,6 @@ import SocketContext  from '../../context/socketContext'
 /*without this indicator - the component gets an err
  src: https://stackoverflow.com/questions/53949393/cant-perform-a-react-state-update-on-an-unmounted-component
 */
-
 
 class MainFrame extends Component {
    
@@ -37,10 +38,12 @@ class MainFrame extends Component {
             {   
                 time: '',
                 txt: '' ,
-                user: ''
+                user: '',
+                avatar: ''
             }
         ],
         userList: [],
+        userDist: {}, //user name : avatar color
         redirect: ''
         }
     }
@@ -53,16 +56,18 @@ class MainFrame extends Component {
             this.setState({...this.state, redirect: <Redirect to={{ pathname: "/login"}}/> })
         }
         else {
-            this.context.socket.emit('updateuserlist',
-            (this.context.data.signUser))
+            let randomColor = (MyColors([Math.floor((Math.random() * MyColorsamt()) + 1)]))
+            console.log(MyColors(Math.floor((Math.random() * MyColorsamt()) + 1)))           
+            //this.setState({...this.state, userDist: {...this.state.userDist, [this.context.data.signUser]:'avi'}})//add user and avatar to the list
+            this.context.socket.emit('updateuserlist', [this.context.data.signUser , randomColor ])//add user and avatar to the list to all
         }
         
         this.context.socket.on('updateuserlistall', (data) => {
             this.updateUserlistState(data)
         })
 
-        this.context.socket.on('userMsgReceived', (msg,sender,timestamp) => {
-            this.updateChatState(msg,sender,timestamp)
+        this.context.socket.on('userMsgReceived', (msg,sender,timestamp,avatar) => {
+            this.updateChatState(msg,sender,timestamp,avatar)
         })
         this.context.socket.emit('displaylastmsg')
         this.context.socket.on('sendlastmsg', (res) => {
@@ -75,13 +80,15 @@ class MainFrame extends Component {
                         {
                             time: res[i].createon,
                             txt: res[i].msg,
-                            user: res[i].userNick
+                            user: res[i].userNick,
+                            avatar: res[i].avatar
                         }
                     ]  
                 }
                 )
             }
         })
+        console.log(this.state)
     }
 
     componentWillUnmount =() => {
@@ -105,7 +112,7 @@ class MainFrame extends Component {
         })
     }
 /* public state updates */
-    updateChatState = (msg,sender,timestamp) => {
+    updateChatState = (msg,sender,timestamp,avatar) => {
         if(!this.cmpMounted)
             return
         //update public chat with the new message
@@ -116,7 +123,8 @@ class MainFrame extends Component {
                     {
                         time: timestamp,
                         txt: msg,
-                        user: sender
+                        user: sender,
+                        avatar: avatar
                     }
                 ]  
             }
@@ -127,14 +135,16 @@ class MainFrame extends Component {
         if(!this.cmpMounted)
             return
          //update public chat with the new message
-         this.setState({...this.state, userList : [...data]})
+         //this.setState({...this.state, userList : [...data]})
+         this.setState({...this.state, userDist : {...data}})
+         
     }
 /* handle input end */ 
 
     publicmsghandler = (e) => {
         if(!this.cmpMounted)
             return
-        this.context.socket.emit('userMsgReceived', { msg: this.state.inputmsg ,sender: this.context.data.signUser});
+        this.context.socket.emit('userMsgReceived', { msg: this.state.inputmsg ,sender: this.context.data.signUser, avatar: this.state.userDist[this.context.data.signUser]});
         this.setState({...this.state,inputmsg: ''})
     }
 
@@ -147,15 +157,16 @@ class MainFrame extends Component {
     }
 
     chatBoxUpdateDOM () {
+        
         return this.state.publicchatlog.map((item,idx)=> {
 
+            let avatar = LetterAvatars(item.user.substring(0,2),item.avatar) //item.avatar
             if (item.time !== '')   {
       //        let uniquetime = 'timebtn' + item.time
                 return (<div key={idx} style={{ padding: '10px' , color: '#0042d6'}}>
                         {/*wanted to make a button to reveal time stamp - for now removed timestamp  */}
                         {/* <Button id={uniquetime} onClick={this.msgTimeHandler}><AccessTimeIcon/><span id={uniquetime} >{item.time} </span></Button>  */}
-                        <span >{item.user}=></span>
-                        <span>{item.txt}</span>
+                        <span >{avatar} {item.txt}</span>
                         </div>);
             }
             else {
@@ -166,18 +177,35 @@ class MainFrame extends Component {
     }
 
     userListUpdateDOM () {
-        let list = this.state.userList;
 
-        if (list === undefined)
+        let list = Object.keys(this.state.userDist)
+        console.log(list)
+        if (list === undefined || list === '')
             return null;
 
         if (list.length < 1)
             return null;
-        return this.state.userList.map((item,idx)=> {
+
+        return list.map((item,idx)=> {
+               let avatar = LetterAvatars(item.substring(0,2),this.state.userDist[item])//{this.state.userDist[item]}
                 return (<div key={idx} style={{ padding: '6px' }}>
-                        <span >{item}<br/></span>
+                        <span >{avatar} {item}<br/></span>
                         </div>);
         })
+
+
+        // let list = this.state.userList;
+
+        // if (list === undefined)
+        //     return null;
+
+        // if (list.length < 1)
+        //     return null;
+        // return this.state.userList.map((item,idx)=> {
+        //         return (<div key={idx} style={{ padding: '6px' }}>
+        //                 <span >{item}<br/></span>
+        //                 </div>);
+        // })
     }
 
     render () {
@@ -186,25 +214,45 @@ class MainFrame extends Component {
         const grids1 = {background: 'linear-gradient(to left, #e0eafc, #cfdef3)'}
         const grids2 =  {background: 'linear-gradient(to left, rgb(224, 234, 252), rgb(174 200 236))'}
         const fonts = {fontWeight: 'bold'}
+
+        
         return (
-            
             <Fragment>
                 <Grid  style={{...barstyle, ...barStyleplus}} container>
                 Chat away: {this.context.data.signUser} !</Grid>
-                <Container variant='outlined' square='false' style={{ minHeight: "84vh",maxHeight: "84vh",  marginTop: '2vh' }}  className='wrapper' >
+                <Container variant='outlined' square='false' style={{minWidth: "60%", minHeight: "84vh",maxHeight: "84vh",  marginTop: '2vh' }}  className='wrapper' >
                  {this.state.redirect}
                  <Grid container>
-                     
-                    <Grid item style={{ minWidth: "75vw" , minHeight: "70vh", maxHeight: "70vh", border: '5px solid white' ,overflowY: 'auto',...grids1, ...fonts}}>
+                    <Grid item  style={{ /* minWidth: "75vw", */width:"79%", minWidth: "60%", minHeight: "70vh", maxHeight: "70vh", border: '5px solid white' ,overflowY: 'auto',...grids1, ...fonts}}>
                         <div style={barstyle}>Chat</div>
                         {this.chatBoxUpdateDOM()}
                     </Grid>
-                    <Grid item className='userlist' style={{ minWidth: "17vw", border: '5px solid white', borderLeft: '0px' ,overflowY: 'auto',...grids2,...fonts}}>
+                    <Grid item className='userlist' style={{ /*minWidth: "17vw",*/ width:"18.5%", minWidth: "10%" ,border: '5px solid white', borderLeft: '0px' ,overflowY: 'auto',...grids2,...fonts}}>
                         <div style={barstyle}>Users</div>
                         {this.userListUpdateDOM()}
                     </Grid>
+                    <Grid container style={{ width:"97.5%" , minWidth: "60%" ,border: '5px solid white', alignContent: 'center',backgroundColor: '#9fc8ca'}}>
+                        <Grid  className='userlist' style={{ /* minWidth: "75vw", */width:"81%" ,minWidth: "60%" }}>   
+                            <TextField id="soutlined"
+                                           style={{ margin: 8, width:"70vw" ,minWidth: "50%"}}
+                                           margin="normal"
+                                           InputLabelProps={{
+                                             shrink: true,
+                                           }}
+                                           name='msgbox' 
+                                           onChange={this.msgHandler}/> 
+                        </Grid>
+                        <Grid  className='userlist'  style={{ /*minWidth: "17vw",*/ width:"19%",minWidth: "10%"}}>              
+                            <Button variant="contained"
+                                    color="default"
+                                    style={{  width:"100%", height: '5.4vh', justifyContent: 'end' ,minWidth: "50%"}}
+                                    startIcon={<CloudUploadIcon  />}
+                                    className='submit' 
+                                    onClick={this.publicmsghandler}>SEND</Button>
+                        </Grid>        
+                    </Grid>
                 </Grid>
-                <Grid container >
+                {/* <Grid container >
                     <Grid container style={{ maxWidth: "92vw"  ,border: '5px solid white', alignContent: 'center',backgroundColor: '#9fc8ca'}}>
                         <Box  width="80%" className='userlist'>   
                             <TextField id="soutlined"
@@ -225,7 +273,7 @@ class MainFrame extends Component {
                                     onClick={this.publicmsghandler}>SEND</Button>
                         </Box>        
                     </Grid>
-                </Grid>
+                </Grid> */}
                 </Container>
             </Fragment>
         )
