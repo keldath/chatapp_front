@@ -12,14 +12,18 @@ import SocketContext  from '../../context/socketContext'
 
 class Loginpage extends Component {
     //remove the state for name and pwd -only bia server
-    state = {
-        cmpMounted : true,
-        name: '',
-        pwd: '',
-        authenticated: false,
-        wrongcred: false,
-        redirect: null
-    }
+    constructor(props){
+		super(props);
+		this.cmpMounted = true;
+        this.state = {
+            cmpMounted : true,
+            name: '',
+            pwd: '',
+            authenticated: false,
+            wrongcred: false,
+            redirect: null
+         }
+    }     
     
     componentDidMount = () => {
         if (!this.state.cmpMounted) {
@@ -52,15 +56,11 @@ class Loginpage extends Component {
             console.log('log succesfull')
             this.redirectHandler(user)
         })
-        
     }
 
-    componentWillUnmount =() => {
-        this.setState({
-            ...this.state,
-            cmpMounted: false
-        })
-    }
+    // componentWillUnmount =() => {
+    //     this.cmpMounted = false;
+    // }
 
     redirectHandler = (user) => {
         console.log(user)
@@ -105,7 +105,7 @@ class Loginpage extends Component {
                 <Grid container justify="center" > 
                     {this.state.redirect}
                     <Grid item style={{ padding: "5px" }}>
-                    <Typography colorSecondary variant="h6" style={{ textDecoration: 'underline' ,  paddingTop: "5px"}}>  Enter Credencials</Typography>
+                    <Typography variant="h6" style={{ textDecoration: 'underline' ,  paddingTop: "5px"}}>  Enter Credencials</Typography>
                     </Grid>
                 </Grid>
                 <Grid container spacing={5} justify="center" >
@@ -136,7 +136,7 @@ class Loginpage extends Component {
                     
                 </Grid>
                 <Grid item  xs={8}>
-                        <Button fullWidth variant="contained" color="primary" className='signin' onClick={this.loginHandler}>SIGNUP</Button>
+                        <Button fullWidth variant="contained" color="primary" className='signin' onClick={this.loginHandler}>Start Chatting...</Button>
                 </Grid>
                 </Grid>
                 {/* <div>test data</div>

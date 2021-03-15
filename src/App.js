@@ -7,7 +7,6 @@ import Loginpage from './components/auth/loginpage'
 import SocketContext, { SocketProvider}  from './context/socketContext' 
 
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
 
@@ -22,6 +21,7 @@ export default class App extends Component {
   //   //sessionStorage.getItem('user');
   // }
 
+  
   render() {
 
     return (
@@ -35,7 +35,10 @@ export default class App extends Component {
          <Typography  style={{ background: 'linear-gradient(to right, rgb(73 153 165), rgb(109 150 154))', 
                                   paddingTop: '10px',
                                   paddingBottom: '5px',
-                                  textAlign: 'center' }}>
+                                  textAlign: 'center' ,
+                                  fontSize: '3vh',
+                                  fontWeight: 'bold',
+                                  textDecoration: 'underline'}}>
                                     Welcome to AnyChat
                                     </Typography>
          <BrowserRouter >
