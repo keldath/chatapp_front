@@ -2,7 +2,7 @@ import React , {Component} from 'react';
 import socketClient from "socket.io-client";
    
 
-const SERVER = "http://127.0.0.1:8080";
+const SERVER = "https://arcane-ocean-47817.herokuapp.com/";/*"http://127.0.0.1:8080";*/
 
 const SocketContext = React.createContext();
 

@@ -33,6 +33,14 @@ class MainFrame extends Component {
 		this.cmpMounted = true;
 		this.state = {
         inputmsg: '',
+        last10msges: [
+            {   
+                time: '',
+                txt: '' ,
+                user: '',
+                avatar: ''
+            }
+        ],
         publicchatlog: [
             {   
                 time: '',
@@ -70,21 +78,22 @@ class MainFrame extends Component {
         this.context.socket.emit('displaylastmsg');
         this.context.socket.on('sendlastmsg', (res) => {
          //show last 10 messages
+            let last10msges = [];
             for(let i=0;i< res.length;i++) {
-                this.setState({
-                    ...this.state,
-                    publicchatlog: 
-                    [...this.state.publicchatlog , 
-                        {
-                            time: res[i].createon,
-                            txt: res[i].msg,
-                            user: res[i].userNick,
-                            avatar: res[i].avatar
-                        }
-                    ]  
-                }
-                )
+                last10msges = [...last10msges, 
+                    {
+                        time: res[i].createon,
+                        txt: res[i].msg,
+                        user: res[i].userNick,
+                        avatar: res[i].avatar
+                    }
+                ] 
             }
+            //remove existing ones.
+            this.setState({
+                ...this.state,
+                last10msges: [...last10msges].reverse() //i got the order from the db backwords...
+            })
         })
     }
 
@@ -157,10 +166,8 @@ class MainFrame extends Component {
     }
 
     chatBoxUpdateDOM () {
-        
-        let reveselist = this.state.publicchatlog/*.reverse();*///i forgotits an object. need to find another way
+        let reveselist = [...this.state.last10msges, ...this.state.publicchatlog]/*make sure the 10 messages appear first.*/
         return reveselist.map((item,idx)=> {
-
             let avatar = LetterAvatars(item.user.substring(0,2),item.avatar) //item.avatar
             let theirMsg = { padding: '10px' , color: '#0042d6' }
             let mymsg = { textAlignLast: 'right'}

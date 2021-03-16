@@ -104,7 +104,7 @@ class Loginpage extends Component {
                     <Grid container justify="center" > 
                         {this.state.redirect}
                         <Grid item style={{ padding: "5px" }}>
-                        <Typography variant="h6" style={{ textDecoration: 'underline' ,  paddingTop: "5px"}}>  Enter Credencials</Typography>
+                        <Typography variant="h6" style={{ textDecoration: 'underline' ,  paddingTop: "5px"}}>Sign In / Sign Up</Typography>
                     </Grid>
                 </Grid>
                 <Grid container spacing={5} justify="center" >
